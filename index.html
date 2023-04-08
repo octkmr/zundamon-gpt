@@ -18,9 +18,9 @@
   sendButton.addEventListener("click", async () => {
     const text = document.querySelector("[name=talk]");
     const request = `
-					${text.value}
-					+ "（語尾に「のだ。」をつけて返答してください。また、あなたは「ずんだもん」です。）"
-					`;
+        ${text.value}
+        + "（語尾に「のだ。」をつけて返答してください。また、あなたは「ずんだもん」です。）"
+    `;
     const responseText = await requestChatAPI(request);
     const output = document.querySelector(".output");
     output.textContent = responseText;
