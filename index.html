@@ -1,84 +1,86 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
     <title>Document</title>
-  </head>
-  <body>
-		<textarea type="text" name="talk"></textarea>
-		<div class="output"></div>
-		<audio class="audio"></audio>
-		<button type="button" class="send">ずんだもんに問うのだ</button>
-    <script>
-        // GPTのAPIキーを入力する
-        const api_key = "";
-  
-        const sendButton = document.querySelector(".send");
-        sendButton.addEventListener("click", async () => {
-          const text = document.querySelector("[name=talk]");
-					const request = `
+</head>
+<body>
+<textarea type="text" name="talk"></textarea>
+<div class="output"></div>
+<audio class="audio"></audio>
+<button type="button" class="send">ずんだもんに問うのだ</button>
+<script>
+  // GPTのAPIキーを入力する
+  const api_key = "";
+
+  const sendButton = document.querySelector(".send");
+  sendButton.addEventListener("click", async () => {
+    const text = document.querySelector("[name=talk]");
+    const request = `
 					${text.value}
 					+ "（語尾に「のだ。」をつけて返答してください。また、あなたは「ずんだもん」です。）"
 					`;
-          const responseText = await requestChatAPI(request);
-          const output = document.querySelector(".output");
-          output.textContent = responseText;
-          await createAudio(responseText);
-        });
+    const responseText = await requestChatAPI(request);
+    const output = document.querySelector(".output");
+    output.textContent = responseText;
+    await createAudio(responseText);
+  });
 
-				// chatgpt
-        async function requestChatAPI(text) {
-          const headers = {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${api_key}`,
-          };
-  
-          const messages = [
-            {
-              role: "user",
-              content: text,
-            },
-          ];
-  
-          const payload = {
-            model: "gpt-3.5-turbo",
-            max_tokens: 128,
-            messages: messages,
-          };
-          const response = await axios.post(
-            "https://api.openai.com/v1/chat/completions",
-            payload,
-            {
-              headers: headers,
-            }
-          );
-          return response.data.choices[0].message.content;
-        }
+  // chatgpt
+  async function requestChatAPI(text) {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${api_key}`,
+    };
 
-				// voicevox
-				async function createAudio(text) {
-					const data = await createVoice(text);
-					const audio = document.querySelector(".audio");
-					audio.src = URL.createObjectURL(data);
-					audio.play();
-				}
-				async function createQuery(text) {
-					const response = await axios.post(
-						`http://localhost:50021/audio_query?speaker=3&text=${text}`
-					);
-					return response.data;
-				}
-				async function createVoice(text) {
-					const query = await createQuery(text);
-					const response = await axios.post(
-						"http://localhost:50021/synthesis?speaker=3",
-						query,
-						{ responseType: "blob" }
-					);
-					return response.data;
-				}
+    const messages = [
+      {
+        role: "user",
+        content: text,
+      },
+    ];
 
-      </script>
-    </body>
-  </html>
+    const payload = {
+      model: "gpt-3.5-turbo",
+      max_tokens: 128,
+      messages: messages,
+    };
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      payload,
+      {
+        headers: headers,
+      }
+    );
+    return response.data.choices[0].message.content;
+  }
+
+  // voicevox
+  async function createAudio(text) {
+    const data = await createVoice(text);
+    const audio = document.querySelector(".audio");
+    audio.src = URL.createObjectURL(data);
+    audio.play();
+  }
+
+  async function createQuery(text) {
+    const response = await axios.post(
+      `http://localhost:50021/audio_query?speaker=3&text=${text}`
+    );
+    return response.data;
+  }
+
+  async function createVoice(text) {
+    const query = await createQuery(text);
+    const response = await axios.post(
+      "http://localhost:50021/synthesis?speaker=3",
+      query,
+      {responseType: "blob"}
+    );
+    return response.data;
+  }
+
+</script>
+</body>
+</html>
